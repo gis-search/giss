@@ -1,0 +1,25 @@
+# Compiled files directory
+target/
+
+# Compiled class files
+*.class
+
+# Log files
+*.log
+*.log.*
+
+# IntelliJ IDEA files
+.idea
+*.iml
+
+# Package files
+*.jar
+*.war
+*.zip
+*.tar.gz
+*.rar
+
+# OS generated files
+.DS_Store
+Icon?
+Thumbs.db
