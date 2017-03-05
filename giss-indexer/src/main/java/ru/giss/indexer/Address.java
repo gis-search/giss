@@ -1,4 +1,4 @@
-package ru.giss.data;
+package ru.giss.indexer;
 
 public interface Address {
 }
