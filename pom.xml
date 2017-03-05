@@ -3,40 +3,25 @@
     <modelVersion>4.0.0</modelVersion>
 
     <groupId>ru.giss</groupId>
-    <artifactId>giss</artifactId>
+    <artifactId>giss-parent</artifactId>
+
+    <packaging>pom</packaging>
 
     <version>0.0.1-SNAPSHOT</version>
 
     <properties>
         <java.version>1.8</java.version>
 
-        <springframework.version>4.3.6.RELEASE</springframework.version>
-        <jackson.version>2.8.7</jackson.version>
-
-        <servlet-api.version>3.1.0</servlet-api.version>
-
         <maven-compiler-plugin.version>3.6.1</maven-compiler-plugin.version>
-        <jetty-maven-plugin.verion>9.4.2.v20170220</jetty-maven-plugin.verion>
+
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
 
-    <dependencies>
-        <dependency>
-            <groupId>org.springframework</groupId>
-            <artifactId>spring-webmvc</artifactId>
-            <version>${springframework.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-            <version>${jackson.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet</groupId>
-            <artifactId>javax.servlet-api</artifactId>
-            <version>${servlet-api.version}</version>
-            <scope>provided</scope>
-        </dependency>
-    </dependencies>
+    <modules>
+        <module>giss-api</module>
+        <module>giss-indexer</module>
+    </modules>
 
     <build>
         <pluginManagement>
@@ -49,11 +34,6 @@
                         <source>${java.version}</source>
                         <target>${java.version}</target>
                     </configuration>
-                </plugin>
-                <plugin>
-                    <groupId>org.eclipse.jetty</groupId>
-                    <artifactId>jetty-maven-plugin</artifactId>
-                    <version>${jetty-maven-plugin.verion}</version>
                 </plugin>
             </plugins>
         </pluginManagement>
