@@ -23,3 +23,5 @@ target/
 .DS_Store
 Icon?
 Thumbs.db
+
+core.properties
