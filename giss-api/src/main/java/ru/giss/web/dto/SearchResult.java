@@ -1,19 +1,31 @@
 package ru.giss.web.dto;
 
-public class SearchResult {
-    private final Long id;
-    private final String address;
+import ru.giss.model.Address;
 
-    public SearchResult(Long id, String address) {
-        this.id = id;
-        this.address = address;
+public class SearchResult {
+    private final String address;
+    private final float lat;
+    private final float lon;
+
+    public SearchResult(Address address) {
+        this(address.fullName(), address.getLat(), address.getLon());
     }
 
-    public Long getId() {
-        return id;
+    public SearchResult(String address, float lat, float lon) {
+        this.address = address;
+        this.lat = lat;
+        this.lon = lon;
     }
 
     public String getAddress() {
         return address;
+    }
+
+    public float getLat() {
+        return lat;
+    }
+
+    public float getLon() {
+        return lon;
     }
 }
