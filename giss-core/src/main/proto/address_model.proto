@@ -1,0 +1,36 @@
+package ru.giss;
+
+enum AddressType {
+    COUNTRY = 1;
+    REGION = 2;
+    AREA = 3;
+    LOCALITY = 4;
+    CITY = 5;
+    VILLAGE = 6;
+    DISTRICT = 7;
+    STREET = 8;
+    HOUSE = 9;
+}
+
+message AddressMsg {
+    optional int32 id = 1;
+    optional int32 parent_id = 2;
+
+    optional string country = 3;
+    optional string region = 4;
+    optional string area = 5;
+    optional string locality = 6;
+    optional string city = 7;
+    optional string village = 8;
+    optional string district = 9;
+    optional string street = 10;
+    optional string house_number = 11;
+
+    optional AddressType type = 12;
+
+    optional float latitude = 13;
+    optional float longitude = 14;
+
+    optional int32 child_count = 15;
+    optional int32 population = 16;
+}

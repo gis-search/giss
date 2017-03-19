@@ -10,4 +10,11 @@
 
     <artifactId>giss-indexer</artifactId>
 
+    <dependencies>
+        <dependency>
+            <groupId>ru.giss</groupId>
+            <artifactId>giss-core</artifactId>
+        </dependency>
+    </dependencies>
+
 </project>
