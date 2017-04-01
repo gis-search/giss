@@ -5,13 +5,15 @@ package ru.giss.util;
  */
 public class StringUtil {
 
-    public static String normalize(String s) {
+    public static String normalize(String s, boolean preserveLength) {
         StringBuilder sb = new StringBuilder();
         for (char c : s.toLowerCase().toCharArray()) {
-            if (c >= 'a' && c <= 'я' || Character.isDigit(c) || c == ' ') {
+            if (c >= 'a' && c <= 'я' || Character.isDigit(c)) {
                 sb.append(c);
             } else if (c == 'ё') {
                 sb.append('е');
+            } else if (preserveLength || Character.isWhitespace(c)) {
+                sb.append(' ');
             }
         }
         return sb.toString();
