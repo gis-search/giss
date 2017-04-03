@@ -15,7 +15,6 @@ import java.util.Map;
 import java.util.Properties;
 import java.util.zip.GZIPInputStream;
 
-import static ru.giss.util.AddressMsgUtil.getName;
 import static ru.giss.util.StringUtil.nGrams;
 import static ru.giss.util.StringUtil.normalize;
 
@@ -53,15 +52,16 @@ public class BackendBuilder {
             Address node = new Address(
                     msg.getId(),
                     nodes.get(msg.getParentId()),
-                    getName(msg),
+                    msg.getName(),
+                    msg.getAddressWordWithPositionList(),
                     msg.getType(),
                     msg.getLatitude(),
                     msg.getLongitude(),
                     msg.getChildCount(),
                     msg.getPopulation());
             nodes.add(node);
-            if (msg.getType() != AddressModel.AddressType.CITY) continue;
-            String[] grams = nGrams(gramLength, normalize(getName(msg)));
+            if (msg.getType() != AddressModel.AddressType.AT_CITY) continue;
+            String[] grams = nGrams(gramLength, normalize(msg.getName(), false));
             for (String gram : grams) {
                 ArrayList<Address> optPosting = index.get(gram);
                 ArrayList<Address> posting = optPosting == null ? new ArrayList<>() : optPosting;

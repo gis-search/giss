@@ -1,36 +1,49 @@
 package ru.giss;
 
 enum AddressType {
-    COUNTRY = 1;
-    REGION = 2;
-    AREA = 3;
-    LOCALITY = 4;
-    CITY = 5;
-    VILLAGE = 6;
-    DISTRICT = 7;
-    STREET = 8;
-    HOUSE = 9;
+    AT_COUNTRY = 1;
+    AT_REGION = 2;
+    AT_AREA = 3;
+    AT_LOCALITY = 4;
+    AT_CITY = 5;
+    AT_VILLAGE = 6;
+    AT_DISTRICT = 7;
+    AT_STREET = 8;
+    AT_HOUSE = 9;
+}
+
+enum AddressWord {
+    AW_ULITSA = 1;
+    AW_PROSPEKT = 2;
+    AW_PLOSCHAD = 3;
+    AW_PEREULOK = 4;
+    AW_METRO = 5;
+    AW_NABEREZHNAYA = 6;
+    AW_LINIYA = 7;
+    AW_SHOSSE = 8;
+    AW_ALLEYA = 9;
+    AW_OBLAST = 10;
+    AW_KRAY = 11;
+    AW_RAYON = 12;
+}
+
+message AddressWordWithPosition {
+    optional AddressWord word = 1;
+    optional bool is_prefix = 2;
 }
 
 message AddressMsg {
     optional int32 id = 1;
     optional int32 parent_id = 2;
 
-    optional string country = 3;
-    optional string region = 4;
-    optional string area = 5;
-    optional string locality = 6;
-    optional string city = 7;
-    optional string village = 8;
-    optional string district = 9;
-    optional string street = 10;
-    optional string house_number = 11;
+    optional string name = 3;
+    repeated AddressWordWithPosition address_word_with_position = 4;
 
-    optional AddressType type = 12;
+    optional AddressType type = 5;
 
-    optional float latitude = 13;
-    optional float longitude = 14;
+    optional float latitude = 6;
+    optional float longitude = 7;
 
-    optional int32 child_count = 15;
-    optional int32 population = 16;
+    optional int32 child_count = 8;
+    optional int32 population = 9;
 }
