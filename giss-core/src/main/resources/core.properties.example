@@ -1,3 +1,4 @@
 # TODO local and common properties with fallbacks
+giss.addresses.csv = your-favorite-dir/giss.csv.gz
 giss.addresses.proto = your-favorite-dir/giss.pb.gz
 giss.gram-length = 2

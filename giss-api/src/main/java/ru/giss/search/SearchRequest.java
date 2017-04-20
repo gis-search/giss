@@ -10,7 +10,7 @@ public class SearchRequest {
     private String text;
 
     public SearchRequest(String rawText) {
-        this.text = normalize(rawText);
+        this.text = normalize(rawText, false);
     }
 
     public String getText() {
