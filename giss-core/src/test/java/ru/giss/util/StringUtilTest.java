@@ -10,7 +10,7 @@ public class StringUtilTest {
         String[] biGrams = StringUtil.nGrams(2, "Москва");
 
         assertArrayEquals(
-                new String[]{"Мо", "ос", "ск", "кв", "ва"},
+                new String[]{"|М", "Мо", "ос", "ск", "кв", "ва"},
                 biGrams
         );
     }
@@ -20,7 +20,7 @@ public class StringUtilTest {
         String[] triGrams = StringUtil.nGrams(3, "Москва");
 
         assertArrayEquals(
-                new String[]{"Мос", "оск", "скв", "ква"},
+                new String[]{"||М", "|Мо", "Мос", "оск", "скв", "ква"},
                 triGrams
         );
     }

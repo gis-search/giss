@@ -20,11 +20,15 @@ public class StringUtil {
     }
 
     public static String[] nGrams(int n, String s) {
-        if (n > s.length()) return new String[] {};
-        int size = s.length() - n + 1;
+        StringBuilder sb = new StringBuilder();
+        for (int i = 0; i < n - 1; i++) {
+            sb.append('|');
+        }
+        String newS = sb.append(s).toString();
+        int size = newS.length() - n + 1;
         String[] res = new String[size];
         for (int i = 0; i < size; i++) {
-            res[i] = s.substring(i, i + n);
+            res[i] = newS.substring(i, i + n);
         }
         return res;
     }
