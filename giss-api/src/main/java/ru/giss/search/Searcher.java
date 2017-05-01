@@ -35,7 +35,7 @@ public class Searcher<T extends Searchable> {
     public ArrayList<Match<T>> search(SearchRequest req) {
         String[] qGrams = nGrams(gramLength, req.getText());
         // Initializing stuff
-        int maxError = (qGrams.length - 1) / 3;
+        int maxError = (qGrams.length - 1) / 3 * 2;
         int[] postPointers = new int[qGrams.length];
         int postingsExhausted = 0;
         List<T>[] postings = new ArrayList[qGrams.length];

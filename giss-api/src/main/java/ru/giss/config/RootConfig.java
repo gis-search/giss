@@ -44,7 +44,10 @@ public class RootConfig {
         LOG.info("Starting building indices...");
 
         try(InputStream is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(gissFile)))) {
-            Map<String, ArrayList<Address>> index = new HashMap<>();
+            Map<String, ArrayList<Address>> regionIndex = new HashMap<>();
+            Map<String, ArrayList<Address>> cityIndex = new HashMap<>();
+            Map<String, ArrayList<Address>> villageIndex = new HashMap<>();
+            Map<String, ArrayList<Address>> streetIndex = new HashMap<>();
             AddressModel.AddressMsg msg;
             ArrayList<Address> nodes = new ArrayList<>(6700000);
             nodes.add(null);
@@ -60,15 +63,17 @@ public class RootConfig {
                         msg.getChildCount(),
                         msg.getPopulation());
                 nodes.add(node);
-                if (msg.getType() != AddressModel.AddressType.AT_CITY) continue;
+                Map<String, ArrayList<Address>> index;
+                switch (msg.getType()) {
+                    case AT_REGION: index = regionIndex; break;
+                    case AT_CITY: index = cityIndex; break;
+                    case AT_VILLAGE: index = villageIndex; break;
+                    case AT_STREET: index = streetIndex; break;
+                    default: continue;
+                }
                 String[] grams = nGrams(gramLength, normalize(msg.getName(), false));
                 for (String gram : grams) {
-                    ArrayList<Address> optPosting = index.get(gram);
-                    ArrayList<Address> posting = optPosting == null ? new ArrayList<>() : optPosting;
-                    posting.add(node);
-                    if (optPosting == null) {
-                        index.put(gram, posting);
-                    }
+                    index.computeIfAbsent(gram, k -> new ArrayList<>()).add(node);
                 }
             }
             Searcher<AddressWordInfo> addrWordSearcher = indexAddrWords();
@@ -76,7 +81,10 @@ public class RootConfig {
 
             return new Backend(
                     addrWordSearcher,
-                    new Searcher<>(index, nodes, new SimpleAddressScoreCounter()));
+                    new Searcher<>(regionIndex, nodes, new SimpleAddressScoreCounter()),
+                    new Searcher<>(cityIndex, nodes, new SimpleAddressScoreCounter()),
+                    new Searcher<>(villageIndex, nodes, new SimpleAddressScoreCounter()),
+                    new Searcher<>(streetIndex, nodes, new SimpleAddressScoreCounter()));
         }
     }
 
