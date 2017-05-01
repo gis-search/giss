@@ -1,11 +1,12 @@
 package ru.giss.util.address;
 
 import ru.giss.AddressModel;
+import ru.giss.util.Searchable;
 
 /**
  * @author Ruslan Izmaylov
  */
-public class AddressWordInfo {
+public class AddressWordInfo implements Searchable {
 
     private AddressModel.AddressWord word;
     private String name;
@@ -17,6 +18,10 @@ public class AddressWordInfo {
         this.name = name;
         this.synonyms = synonyms;
         this.addressType = addressType;
+    }
+
+    public int getId() {
+        return word.getNumber();
     }
 
     public AddressModel.AddressWord getWord() {

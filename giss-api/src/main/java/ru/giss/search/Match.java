@@ -1,21 +1,19 @@
 package ru.giss.search;
 
-import ru.giss.model.Address;
-
 /**
  * @author Ruslan Izmaylov
  */
-public class Match {
+public class Match<T> {
 
-    private Address doc;
+    private T doc;
     private int score;
 
-    public Match(Address doc, int score) {
+    public Match(T doc, int score) {
         this.doc = doc;
         this.score = score;
     }
 
-    public Address getDoc() {
+    public T getDoc() {
         return doc;
     }
 

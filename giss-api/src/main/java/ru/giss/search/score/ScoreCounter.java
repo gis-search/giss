@@ -1,6 +1,5 @@
 package ru.giss.search.score;
 
-import ru.giss.model.Address;
 import ru.giss.search.SearchRequest;
 
 /**
@@ -8,7 +7,7 @@ import ru.giss.search.SearchRequest;
  *
  * @author Ruslan Izmaylov
  */
-public interface ScoreCounter {
+public interface ScoreCounter<T> {
 
-    int count(SearchRequest req, int matchedGramCount, Address doc);
+    int count(SearchRequest req, int matchedGramCount, T doc);
 }

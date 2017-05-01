@@ -4,10 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
+import ru.giss.config.Backend;
 import ru.giss.model.Address;
 import ru.giss.search.Match;
 import ru.giss.search.SearchRequest;
-import ru.giss.search.Searcher;
 import ru.giss.web.dto.SearchResult;
 
 import java.util.ArrayList;
@@ -15,12 +15,12 @@ import java.util.ArrayList;
 @RestController
 public class ApiController {
     @Autowired
-    private Searcher citySearcher;
+    private Backend backend;
 
     @GetMapping("/search")
     public SearchResult search(
             @RequestParam(value = "text") String text) {
-        ArrayList<Match> results = citySearcher.search(new SearchRequest(text));
+        ArrayList<Match<Address>> results = backend.getCitySearcher().search(new SearchRequest(text));
         if (results.isEmpty()) {
             return null;
         } else {

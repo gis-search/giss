@@ -1,49 +1,46 @@
 package ru.giss.search;
 
-import ru.giss.model.Address;
 import ru.giss.search.score.ScoreCounter;
-import ru.giss.search.score.SimpleScoreCounter;
+import ru.giss.util.Searchable;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
 
 import static ru.giss.util.StringUtil.nGrams;
 
 /**
  * @author Ruslan Izmaylov
  */
-public class Searcher {
+public class Searcher<T extends Searchable> {
 
-    private final static List<Address> EMPTY_POSTING = new ArrayList<>(0);
+    private final List<T> EMPTY_POSTING = new ArrayList<>(0);
 
-    private Map<String, ArrayList<Address>> index;
-    private ArrayList<Address> nodes;
-    private ScoreCounter scoreCounter;
+    private Map<String, ArrayList<T>> index;
+    private ArrayList<T> docs;
+    private ScoreCounter<T> scoreCounter;
 
     private int gramLength;
 
-    public Searcher(Map<String, ArrayList<Address>> index,
-                    ArrayList<Address> nodes) {
-        this(index, nodes, new SimpleScoreCounter());
-    }
-
-    public Searcher(Map<String, ArrayList<Address>> index,
-                    ArrayList<Address> nodes,
-                    ScoreCounter scoreCounter) {
+    public Searcher(Map<String, ArrayList<T>> index,
+                    ArrayList<T> docs,
+                    ScoreCounter<T> scoreCounter) {
         this.index = index;
-        this.nodes = nodes;
+        this.docs = docs;
         this.scoreCounter = scoreCounter;
         this.gramLength = index.keySet().iterator().next().length();
     }
 
-    public ArrayList<Match> search(SearchRequest req) {
+    public ArrayList<Match<T>> search(SearchRequest req) {
         String[] qGrams = nGrams(gramLength, req.getText());
         // Initializing stuff
-        int maxError = Math.min(2, qGrams.length - 1); // TODO think about a better value
+        int maxError = (qGrams.length - 1) / 3;
         int[] postPointers = new int[qGrams.length];
         int postingsExhausted = 0;
-        List<Address>[] postings = new ArrayList[qGrams.length];
+        List<T>[] postings = new ArrayList[qGrams.length];
         for (int i = 0; i < qGrams.length; i++) {
-            ArrayList<Address> optPosting = index.get(qGrams[i]);
+            ArrayList<T> optPosting = index.get(qGrams[i]);
             if (optPosting == null) {
                 postingsExhausted++;
                 postings[i] = EMPTY_POSTING;
@@ -53,7 +50,7 @@ public class Searcher {
         }
         Arrays.fill(postPointers, -1);
         // a heap with score sorting might be better
-        ArrayList<Match> matches = new ArrayList<>();
+        ArrayList<Match<T>> matches = new ArrayList<>();
         // Traversing postings
         while (postingsExhausted <= maxError) {
             postingsExhausted = 0;
@@ -77,7 +74,7 @@ public class Searcher {
             // traversing postings until an interesting doc
             int matchedGramCount = 0;
             for (int i = 0; i < postings.length; i++) {
-                List<Address> posting = postings[i];
+                List<T> posting = postings[i];
                 // surprisingly, binary search works slower
                 // it's likely because of random array accesses
                 // which cause cache misses
@@ -110,8 +107,8 @@ public class Searcher {
                 postPointers[i] = cur;
             }
             if (qGrams.length - matchedGramCount <= maxError) {
-                Address doc = nodes.get(interestingDocId);
-                matches.add(new Match(doc, scoreCounter.count(req, matchedGramCount, doc)));
+                T doc = docs.get(interestingDocId);
+                matches.add(new Match<>(doc, scoreCounter.count(req, matchedGramCount, doc)));
             }
         }
         matches.sort((m1, m2) -> m2.getScore() - m1.getScore());

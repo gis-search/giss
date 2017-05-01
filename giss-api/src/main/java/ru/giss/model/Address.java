@@ -2,6 +2,7 @@ package ru.giss.model;
 
 import ru.giss.AddressModel.AddressType;
 import ru.giss.AddressModel.AddressWordWithPosition;
+import ru.giss.util.Searchable;
 import ru.giss.util.address.IndexedAddressedWords;
 
 import java.util.List;
@@ -9,7 +10,7 @@ import java.util.List;
 /**
  * @author Ruslan Izmaylov
  */
-public class Address {
+public class Address implements Searchable {
 
     private final int id;
     private final Address parent;

@@ -6,7 +6,7 @@ import ru.giss.search.SearchRequest;
 /**
  * @author Ruslan Izmaylov
  */
-public class SimpleScoreCounter implements ScoreCounter {
+public class SimpleAddressScoreCounter implements ScoreCounter<Address> {
 
     @Override
     public int count(SearchRequest req, int matchedGramCount, Address doc) {

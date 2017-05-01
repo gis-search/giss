@@ -11,14 +11,17 @@ import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import ru.giss.AddressModel;
 import ru.giss.model.Address;
 import ru.giss.search.Searcher;
+import ru.giss.search.score.SimpleAddressScoreCounter;
+import ru.giss.search.score.SimpleAddressWordScoreCounter;
+import ru.giss.util.StringUtil;
+import ru.giss.util.address.AddressWordInfo;
+import ru.giss.util.address.IndexedAddressedWords;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.zip.GZIPInputStream;
 
 import static ru.giss.util.StringUtil.nGrams;
@@ -37,7 +40,7 @@ public class RootConfig {
     private int gramLength;
 
     @Bean
-    public Searcher getSearcher() throws IOException {
+    public Backend getBackend() throws IOException {
         LOG.info("Starting building indices...");
 
         try(InputStream is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(gissFile)))) {
@@ -68,10 +71,33 @@ public class RootConfig {
                     }
                 }
             }
-
+            Searcher<AddressWordInfo> addrWordSearcher = indexAddrWords();
             LOG.info("Finished building indices");
-            return new Searcher(index, nodes);
+
+            return new Backend(
+                    addrWordSearcher,
+                    new Searcher<>(index, nodes, new SimpleAddressScoreCounter()));
         }
+    }
+
+    private Searcher<AddressWordInfo> indexAddrWords() {
+        Map<String, ArrayList<AddressWordInfo>> index = new HashMap<>();
+        Set<AddressWordInfo> addrWords = new TreeSet<>(Comparator.comparingInt(AddressWordInfo::getId));
+        addrWords.addAll(IndexedAddressedWords.getAddressWordToInfo().values());
+        ArrayList<AddressWordInfo> docs = new ArrayList<>();
+        docs.add(null);
+        for (AddressWordInfo info : addrWords) {
+            Set<String> nGrams = new HashSet<>();
+            Collections.addAll(nGrams, StringUtil.nGrams(gramLength, info.getName()));
+            for (String syn : info.getSynonyms()) {
+                Collections.addAll(nGrams, StringUtil.nGrams(gramLength, syn));
+            }
+            for (String nGram : nGrams) {
+                index.computeIfAbsent(nGram, k -> new ArrayList<>()).add(info);
+            }
+            docs.add(info);
+        }
+        return new Searcher<>(index, docs, new SimpleAddressWordScoreCounter());
     }
 
     @Bean
