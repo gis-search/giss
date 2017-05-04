@@ -1,16 +1,15 @@
-package ru.giss.model;
+package ru.giss.util.model.address;
 
+import static ru.giss.AddressModel.AddressType.*;
 import ru.giss.AddressModel.AddressType;
 import ru.giss.AddressModel.AddressWordWithPosition;
-import ru.giss.util.Searchable;
-import ru.giss.util.address.IndexedAddressedWords;
 
 import java.util.List;
 
 /**
  * @author Ruslan Izmaylov
  */
-public class Address implements Searchable {
+public class Address {
 
     private final int id;
     private final Address parent;
@@ -39,13 +38,22 @@ public class Address implements Searchable {
         this.lat = lat;
         this.lon = lon;
 
-        // TODO better scoring
-        if (type == AddressType.AT_CITY) {
+        if (type == AT_CITY) {
             score = population + parent.score;
-        } else if (type == AddressType.AT_COUNTRY) {
+        } else if (type == AT_COUNTRY) {
             score = 0;
         } else {
             score = childCount;
+        }
+        if (type != AT_HOUSE && type != AT_DISTRICT) {
+            Address cur = parent;
+            while (cur != null) {
+                if (cur.getType() == AT_CITY || cur.getType() == AT_VILLAGE || cur.getType() == AT_DISTRICT) {
+                    score += parent.getScore();
+                    break;
+                }
+                cur = cur.getParent();
+            }
         }
     }
 
@@ -101,8 +109,21 @@ public class Address implements Searchable {
         return "Address{" +
                 "id=" + id +
                 ", name='" + name + '\'' +
-                ", lat=" + lat +
-                ", lon=" + lon +
                 '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        Address address = (Address) o;
+
+        return id == address.id;
+    }
+
+    @Override
+    public int hashCode() {
+        return id;
     }
 }

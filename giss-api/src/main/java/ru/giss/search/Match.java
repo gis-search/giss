@@ -6,9 +6,9 @@ package ru.giss.search;
 public class Match<T> {
 
     private T doc;
-    private int score;
+    private long score;
 
-    public Match(T doc, int score) {
+    public Match(T doc, long score) {
         this.doc = doc;
         this.score = score;
     }
@@ -17,7 +17,7 @@ public class Match<T> {
         return doc;
     }
 
-    public int getScore() {
+    public long getScore() {
         return score;
     }
 

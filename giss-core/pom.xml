@@ -31,6 +31,10 @@
             <artifactId>ahocorasick</artifactId>
         </dependency>
         <dependency>
+            <groupId>org.pcollections</groupId>
+            <artifactId>pcollections</artifactId>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>${junit.version}</version>

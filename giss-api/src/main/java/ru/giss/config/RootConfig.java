@@ -9,13 +9,15 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import ru.giss.AddressModel;
-import ru.giss.model.Address;
+import ru.giss.search.Document;
 import ru.giss.search.Searcher;
-import ru.giss.search.score.SimpleAddressScoreCounter;
-import ru.giss.search.score.SimpleAddressWordScoreCounter;
-import ru.giss.util.StringUtil;
-import ru.giss.util.address.AddressWordInfo;
-import ru.giss.util.address.IndexedAddressedWords;
+import ru.giss.search.parsing.Parser;
+import ru.giss.search.request.SearchRequest;
+import ru.giss.search.score.AddressScoreCounter;
+import ru.giss.search.score.AddressWordScoreCounter;
+import ru.giss.util.model.address.Address;
+import ru.giss.util.model.address.AddressWordInfo;
+import ru.giss.util.model.address.IndexedAddressedWords;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -24,8 +26,7 @@ import java.io.InputStream;
 import java.util.*;
 import java.util.zip.GZIPInputStream;
 
-import static ru.giss.util.StringUtil.nGrams;
-import static ru.giss.util.StringUtil.normalize;
+import static ru.giss.AddressModel.AddressType.AT_HOUSE;
 
 @Configuration
 @ComponentScan(basePackages = "ru.giss")
@@ -40,17 +41,19 @@ public class RootConfig {
     private int gramLength;
 
     @Bean
-    public Backend getBackend() throws IOException {
+    public Parser getParser() throws IOException {
         LOG.info("Starting building indices...");
 
         try(InputStream is = new BufferedInputStream(new GZIPInputStream(new FileInputStream(gissFile)))) {
-            Map<String, ArrayList<Address>> regionIndex = new HashMap<>();
-            Map<String, ArrayList<Address>> cityIndex = new HashMap<>();
-            Map<String, ArrayList<Address>> villageIndex = new HashMap<>();
-            Map<String, ArrayList<Address>> streetIndex = new HashMap<>();
+            Map<String, ArrayList<Document<Address>>> regionIndex = new HashMap<>();
+            Map<String, ArrayList<Document<Address>>> cityIndex = new HashMap<>();
+            Map<String, ArrayList<Document<Address>>> villageIndex = new HashMap<>();
+            Map<String, ArrayList<Document<Address>>> streetIndex = new HashMap<>();
             AddressModel.AddressMsg msg;
             ArrayList<Address> nodes = new ArrayList<>(6700000);
+            ArrayList<Document<Address>> docs = new ArrayList<>(500000);
             nodes.add(null);
+            int curDocId = 0;
             while ((msg = AddressModel.AddressMsg.parseDelimitedFrom(is)) != null) {
                 Address node = new Address(
                         msg.getId(),
@@ -63,7 +66,7 @@ public class RootConfig {
                         msg.getChildCount(),
                         msg.getPopulation());
                 nodes.add(node);
-                Map<String, ArrayList<Address>> index;
+                Map<String, ArrayList<Document<Address>>> index;
                 switch (msg.getType()) {
                     case AT_REGION: index = regionIndex; break;
                     case AT_CITY: index = cityIndex; break;
@@ -71,41 +74,47 @@ public class RootConfig {
                     case AT_STREET: index = streetIndex; break;
                     default: continue;
                 }
-                String[] grams = nGrams(gramLength, normalize(msg.getName(), false));
-                for (String gram : grams) {
-                    index.computeIfAbsent(gram, k -> new ArrayList<>()).add(node);
+                if (msg.getType() != AT_HOUSE) {
+                    Document<Address> doc = new Document<>(gramLength, curDocId++, node.getName(), node);
+                    docs.add(doc);
+                    for (String gram : doc.getGrams().keySet()) {
+                        index.computeIfAbsent(gram, k -> new ArrayList<>()).add(doc);
+                    }
                 }
             }
-            Searcher<AddressWordInfo> addrWordSearcher = indexAddrWords();
+            Searcher<AddressWordInfo, SearchRequest> addrWordSearcher = indexAddrWords();
             LOG.info("Finished building indices");
 
-            return new Backend(
+            Backend backend =  new Backend(
+                    gramLength,
                     addrWordSearcher,
-                    new Searcher<>(regionIndex, nodes, new SimpleAddressScoreCounter()),
-                    new Searcher<>(cityIndex, nodes, new SimpleAddressScoreCounter()),
-                    new Searcher<>(villageIndex, nodes, new SimpleAddressScoreCounter()),
-                    new Searcher<>(streetIndex, nodes, new SimpleAddressScoreCounter()));
+                    new Searcher<>(regionIndex, docs, new AddressScoreCounter()),
+                    new Searcher<>(cityIndex, docs, new AddressScoreCounter()),
+                    new Searcher<>(villageIndex, docs, new AddressScoreCounter()),
+                    new Searcher<>(streetIndex, docs, new AddressScoreCounter()));
+            return new Parser(backend);
         }
     }
 
-    private Searcher<AddressWordInfo> indexAddrWords() {
-        Map<String, ArrayList<AddressWordInfo>> index = new HashMap<>();
+    private Searcher<AddressWordInfo, SearchRequest> indexAddrWords() {
+        Map<String, ArrayList<Document<AddressWordInfo>>> index = new HashMap<>();
         Set<AddressWordInfo> addrWords = new TreeSet<>(Comparator.comparingInt(AddressWordInfo::getId));
         addrWords.addAll(IndexedAddressedWords.getAddressWordToInfo().values());
-        ArrayList<AddressWordInfo> docs = new ArrayList<>();
-        docs.add(null);
+        ArrayList<Document<AddressWordInfo>> docs = new ArrayList<>();
+        int curDocId = 0;
         for (AddressWordInfo info : addrWords) {
-            Set<String> nGrams = new HashSet<>();
-            Collections.addAll(nGrams, StringUtil.nGrams(gramLength, info.getName()));
-            for (String syn : info.getSynonyms()) {
-                Collections.addAll(nGrams, StringUtil.nGrams(gramLength, syn));
+            List<String> terms = new ArrayList<>(info.getSynonyms().length + 1);
+            terms.addAll(Arrays.asList(info.getSynonyms()));
+            terms.add(info.getName());
+            for (String term : terms) {
+                Document<AddressWordInfo> doc = new Document<>(gramLength, curDocId++, term, info);
+                docs.add(doc);
+                for (String gram : doc.getGrams().keySet()) {
+                    index.computeIfAbsent(gram, k -> new ArrayList<>()).add(doc);
+                }
             }
-            for (String nGram : nGrams) {
-                index.computeIfAbsent(nGram, k -> new ArrayList<>()).add(info);
-            }
-            docs.add(info);
         }
-        return new Searcher<>(index, docs, new SimpleAddressWordScoreCounter());
+        return new Searcher<>(index, docs, new AddressWordScoreCounter());
     }
 
     @Bean

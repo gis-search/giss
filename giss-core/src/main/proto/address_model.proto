@@ -25,6 +25,9 @@ enum AddressWord {
     AW_OBLAST = 10;
     AW_KRAY = 11;
     AW_RAYON = 12;
+    AW_GOROD = 13;
+    AW_RESPUBLIKA = 14;
+    AW_AVTONOMNY_OKRUG = 15;
 }
 
 message AddressWordWithPosition {

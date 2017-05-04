@@ -2,7 +2,7 @@ package ru.giss.indexer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import ru.giss.AddressModel;
-import ru.giss.util.address.AddressWordUtil;
+import ru.giss.util.model.address.AddressWordUtil;
 
 import java.io.*;
 import java.util.List;

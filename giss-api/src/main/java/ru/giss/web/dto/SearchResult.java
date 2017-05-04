@@ -1,6 +1,6 @@
 package ru.giss.web.dto;
 
-import ru.giss.model.Address;
+import ru.giss.util.model.address.Address;
 
 public class SearchResult {
     private final String address;

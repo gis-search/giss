@@ -1,12 +1,11 @@
-package ru.giss.util.address;
+package ru.giss.util.model.address;
 
 import ru.giss.AddressModel;
-import ru.giss.util.Searchable;
 
 /**
  * @author Ruslan Izmaylov
  */
-public class AddressWordInfo implements Searchable {
+public class AddressWordInfo {
 
     private AddressModel.AddressWord word;
     private String name;
@@ -38,5 +37,10 @@ public class AddressWordInfo implements Searchable {
 
     public AddressModel.AddressType getAddressType() {
         return addressType;
+    }
+
+    @Override
+    public String toString() {
+        return "AddressWordInfo{" + word + "}";
     }
 }
