@@ -26,7 +26,7 @@ public class IndexedAddressedWords {
         infos.add(new AddressWordInfo(AW_PROSPEKT, "проспект", new String[] { "пр" }, AT_STREET));
         infos.add(new AddressWordInfo(AW_PLOSCHAD, "площадь", new String[] { "пл" }, AT_STREET));
         infos.add(new AddressWordInfo(AW_PEREULOK, "переулок", new String[] { "пер" }, AT_STREET));
-        infos.add(new AddressWordInfo(AW_METRO, "станция метро", new String[] { "ст м" }, AT_STREET));
+        infos.add(new AddressWordInfo(AW_METRO, "станция метро", new String[] { "ст м", "метро"}, AT_STREET));
         infos.add(new AddressWordInfo(AW_NABEREZHNAYA, "набережная", new String[] { "наб" }, AT_STREET));
         infos.add(new AddressWordInfo(AW_LINIYA, "линия", new String[] { "л" }, AT_STREET));
         infos.add(new AddressWordInfo(AW_SHOSSE, "шоссе", new String[] { "ш" }, AT_STREET));
@@ -38,6 +38,7 @@ public class IndexedAddressedWords {
         infos.add(new AddressWordInfo(AW_RESPUBLIKA, "республика", new String[] { "респ" }, AT_REGION));
         infos.add(new AddressWordInfo(AW_AVTONOMNY_OKRUG, "автономный округ", new String[] { "ао", "а о", "автономная область" }, AT_REGION));
         infos.add(new AddressWordInfo(AW_BULVAR, "бульвар", new String[] { "бульвар" }, AT_STREET));
+        infos.add(new AddressWordInfo(AW_PROEZD, "проезд", new String[] { "пр" }, AT_STREET));
 
         nameToAddressWordInfos = new HashMap<>();
         addressWordToInfo = new HashMap<>();

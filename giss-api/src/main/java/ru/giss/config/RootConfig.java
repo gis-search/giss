@@ -67,7 +67,7 @@ public class RootConfig {
             nodes.add(null);
             int curDocId = 0;
             while ((msg = AddressModel.AddressMsg.parseDelimitedFrom(is)) != null) {
-                if (msg.getId() % 100000 == 0) System.out.println("Processing id " + msg.getId());
+                if (msg.getId() % 100000 == 0) LOG.info("Processing id " + msg.getId());
                 Address parent = nodes.get(msg.getParentId());
                 Address node = new Address(
                         msg.getId(),

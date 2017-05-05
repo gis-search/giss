@@ -6,6 +6,8 @@ import ru.giss.search.request.AddressSearchRequest;
 import ru.giss.util.StringUtil;
 import ru.giss.util.model.address.Address;
 
+import static java.lang.Character.isDigit;
+
 /**
  * @author Ruslan Izmaylov
  */
@@ -14,6 +16,9 @@ public class AddressScoreCounter implements ScoreCounter<Document<Address>, Addr
     @Override
     public long count(AddressSearchRequest req, Document<Address> doc) {
         if (Math.abs(req.getText().length() - doc.getTerm().length()) > 1) {
+            return -1;
+        }
+        if (isDigit(req.getText().charAt(req.getText().length() - 1)) && !isDigit(doc.getTerm().charAt(doc.getTerm().length() - 1))) {
             return -1;
         }
 

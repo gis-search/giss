@@ -151,10 +151,9 @@ public class Parser {
                     }
                 }
                 Address resultAddress = buildingToAddress.get(optBuilding);
-                boolean isBuildingParsed = true;
+                boolean isBuildingParsed = optBuilding != null && resultAddress != null;
                 if (resultAddress == null && optBuilding != null) {
                     resultAddress = buildingToAddress.get(null);
-                    isBuildingParsed = false;
                 }
                 if (resultAddress == null) {
                     List<ParseContext>  resContexts = new ArrayList<>(buildingToAddress.values().size());

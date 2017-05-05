@@ -28,7 +28,7 @@ public class Searcher<D, R extends SearchRequest> {
         String[] qGrams = new String[req.getGrams().size()];
         req.getGrams().toArray(qGrams);
         // Initializing stuff
-        int maxError = Math.min(4, (qGrams.length - 1) / 3 * 2 + 1);
+        int maxError = Math.min(6, (qGrams.length - 1) / 3 * 2 + 1);
         if (qGrams.length <= 2) maxError = 0;
         int[] postPointers = new int[qGrams.length];
         int postingsExhausted = 0;
