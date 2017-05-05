@@ -23,12 +23,12 @@ public class ApiController {
 
     @GetMapping("/search")
     public List<SearchResult> search(
-            @RequestParam(value = "text") String text) {
-        long t0 = System.currentTimeMillis();
+            @RequestParam(value = "text") String text,
+            @RequestParam(value = "debug", required = false) String debugStr) {
         List<ParseResult> results = parser.parse(text);
-        System.out.println(System.currentTimeMillis() - t0);
+        boolean debug = debugStr != null && debugStr.equals("true");
         return results.stream()
-                .map(r -> new SearchResult(r.getAddress()))
+                .map(r -> new SearchResult(r, debug))
                 .collect(Collectors.toList());
     }
 }

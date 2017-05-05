@@ -49,4 +49,13 @@ public class Token {
     public int hashCode() {
         return position;
     }
+
+    @Override
+    public String toString() {
+        return "Token{" +
+                "position=" + position +
+                ", string='" + string + '\'' +
+                ", type=" + type +
+                '}';
+    }
 }
