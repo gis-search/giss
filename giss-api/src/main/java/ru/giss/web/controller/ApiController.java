@@ -24,9 +24,8 @@ public class ApiController {
     @GetMapping("/search")
     public List<SearchResult> search(
             @RequestParam(value = "text") String text,
-            @RequestParam(value = "debug", required = false) String debugStr) {
+            @RequestParam(value = "debug", required = false) boolean debug) {
         List<ParseResult> results = parser.parse(text);
-        boolean debug = debugStr != null && debugStr.equals("true");
         return results.stream()
                 .map(r -> new SearchResult(r, debug))
                 .collect(Collectors.toList());

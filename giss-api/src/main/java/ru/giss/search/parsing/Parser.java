@@ -41,6 +41,7 @@ public class Parser {
         Comparator<ParseContext> comparator =
                 (o1, o2) -> Long.compare(o2.countScore(), o1.countScore());
         return Stream.of(new ParseContext(tokens))
+                .parallel()
                 .map(this::parseAddressWords)
                 .flatMap(this::parseRegion).distinct().sorted(comparator).limit(10)
                 .flatMap(this::parseCity).distinct().sorted(comparator).limit(10)
