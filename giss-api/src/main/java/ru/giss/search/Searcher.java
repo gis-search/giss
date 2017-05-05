@@ -26,9 +26,10 @@ public class Searcher<D, R extends SearchRequest> {
 
     public ArrayList<Match<D>> search(R req) {
         String[] qGrams = new String[req.getGrams().size()];
-        req.getGrams().keySet().toArray(qGrams);
+        req.getGrams().toArray(qGrams);
         // Initializing stuff
         int maxError = Math.min(4, (qGrams.length - 1) / 3 * 2 + 1);
+        if (qGrams.length <= 2) maxError = 0;
         int[] postPointers = new int[qGrams.length];
         int postingsExhausted = 0;
         List<Document<D>>[] postings = new ArrayList[qGrams.length];

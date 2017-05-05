@@ -37,6 +37,7 @@ public class IndexedAddressedWords {
         infos.add(new AddressWordInfo(AW_GOROD, "город", new String[] { "гор", "г" }, AT_CITY));
         infos.add(new AddressWordInfo(AW_RESPUBLIKA, "республика", new String[] { "респ" }, AT_REGION));
         infos.add(new AddressWordInfo(AW_AVTONOMNY_OKRUG, "автономный округ", new String[] { "ао", "а о", "автономная область" }, AT_REGION));
+        infos.add(new AddressWordInfo(AW_BULVAR, "бульвар", new String[] { "бульвар" }, AT_STREET));
 
         nameToAddressWordInfos = new HashMap<>();
         addressWordToInfo = new HashMap<>();

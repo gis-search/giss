@@ -30,6 +30,8 @@ import java.util.regex.Pattern;
 import java.util.zip.GZIPInputStream;
 
 import static ru.giss.AddressModel.AddressType.AT_HOUSE;
+import static ru.giss.util.StringUtil.nGramSet;
+import static ru.giss.util.StringUtil.normalize;
 
 @Configuration
 @ComponentScan(basePackages = "ru.giss")
@@ -46,7 +48,7 @@ public class RootConfig {
     public final static String NUMBER_REGEX_GROUP = "number";
     public final static String BUILDING_REGEX_GROUP = "building";
     public final static Pattern HOUSE_REGEX =
-            Pattern.compile("(?<" + NUMBER_REGEX_GROUP + ">\\d{1,4}[а-я&&[^кс]]?) ?(?:[к\\-](?<" + BUILDING_REGEX_GROUP + ">\\d{1,2}))?");
+            Pattern.compile("(?<" + NUMBER_REGEX_GROUP + ">\\d{1,4}[а-я&&[^кс]]?) ?(?:[кс\\-](?<" + BUILDING_REGEX_GROUP + ">\\d{1,2}))?");
 
     @Bean
     public Parser getParser() throws IOException {
@@ -87,9 +89,11 @@ public class RootConfig {
                         case AT_STREET: index = streetIndex; break;
                         default: continue;
                     }
-                    Document<Address> doc = new Document<>(gramLength, curDocId++, node.getName(), node);
+                    String normName = normalize(node.getName(), true);
+                    Document<Address> doc = new Document<>(curDocId++, normName, node);
                     docs.add(doc);
-                    for (String gram : doc.getGrams().keySet()) {
+                    Set<String> nGrams = nGramSet(gramLength, normName);
+                    for (String gram : nGrams) {
                         index.computeIfAbsent(gram, k -> new ArrayList<>()).add(doc);
                     }
                 } else {
@@ -131,9 +135,11 @@ public class RootConfig {
             terms.addAll(Arrays.asList(info.getSynonyms()));
             terms.add(info.getName());
             for (String term : terms) {
-                Document<AddressWordInfo> doc = new Document<>(gramLength, curDocId++, term, info);
+                term = normalize(term, true);
+                Document<AddressWordInfo> doc = new Document<>(curDocId++, term, info);
                 docs.add(doc);
-                for (String gram : doc.getGrams().keySet()) {
+                Set<String> nGrams = nGramSet(gramLength, term);
+                for (String gram : nGrams) {
                     index.computeIfAbsent(gram, k -> new ArrayList<>()).add(doc);
                 }
             }

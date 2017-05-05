@@ -26,6 +26,7 @@
         <commons-lang3.version>3.5</commons-lang3.version>
         <ahocorasick.version>0.3.0</ahocorasick.version>
         <pcollections.version>2.1.2</pcollections.version>
+        <java-string-similarity.version>0.23</java-string-similarity.version>
 
         <logback.version>1.2.3</logback.version>
     </properties>
@@ -88,6 +89,11 @@
                 <groupId>org.pcollections</groupId>
                 <artifactId>pcollections</artifactId>
                 <version>${pcollections.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>info.debatty</groupId>
+                <artifactId>java-string-similarity</artifactId>
+                <version>${java-string-similarity.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>

@@ -11,13 +11,13 @@ import ru.giss.util.model.address.AddressWordInfo;
 public class AddressWordScoreCounter implements ScoreCounter<Document<AddressWordInfo>, SearchRequest> {
 
     public long count(SearchRequest req, Document<AddressWordInfo> doc) {
-        if (Math.abs(req.getText().length() - doc.getTerm().length()) > 2) {
+        if (Math.abs(req.getText().length() - doc.getTerm().length()) > 1) {
             return -1;
         }
-        double gramDist = StringUtil.normGramDistance(req.getGrams(), doc.getGrams());
-        if (gramDist > 0.4) {
+        double similarity = StringUtil.similarity(req.getText(), doc.getTerm());
+        if (similarity < 0.85) {
             return -1;
         }
-        return (int) ((1 - gramDist) * 1000);
+        return (int) (similarity * 1000);
     }
 }

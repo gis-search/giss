@@ -13,7 +13,7 @@ public class AddressScoreCounter implements ScoreCounter<Document<Address>, Addr
 
     @Override
     public long count(AddressSearchRequest req, Document<Address> doc) {
-        if (Math.abs(req.getText().length() - doc.getTerm().length()) > 2) {
+        if (Math.abs(req.getText().length() - doc.getTerm().length()) > 1) {
             return -1;
         }
 
@@ -31,8 +31,8 @@ public class AddressScoreCounter implements ScoreCounter<Document<Address>, Addr
             return -1;
         }
 
-        double gramDist = StringUtil.normGramDistance(req.getGrams(), doc.getGrams());
-        if (gramDist > 0.4) {
+        double similarity = StringUtil.similarity(req.getText(), doc.getTerm());
+        if (similarity < 0.85) {
             return -1;
         }
 
@@ -43,7 +43,7 @@ public class AddressScoreCounter implements ScoreCounter<Document<Address>, Addr
             }
         }
 
-        return (int) ((1 - gramDist) * 1000000000L) +
+        return (int) (similarity * 1000000000L) +
                 addressWordScore * 100000000L +
                 doc.getItem().getScore();
     }

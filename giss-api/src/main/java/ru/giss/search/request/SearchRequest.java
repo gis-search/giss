@@ -2,7 +2,7 @@ package ru.giss.search.request;
 
 import ru.giss.util.StringUtil;
 
-import java.util.Map;
+import java.util.Set;
 
 import static ru.giss.util.StringUtil.normalize;
 
@@ -13,19 +13,19 @@ public class SearchRequest {
 
     protected String text;
     protected int gramLength;
-    protected Map<String, Integer> grams;
+    protected Set<String> grams;
 
     public SearchRequest(String rawText, int gramLength) {
         this.text = normalize(rawText, false);;
         this.gramLength = gramLength;
-        this.grams = StringUtil.nGramMap(gramLength, text);
+        this.grams = StringUtil.nGramSet(gramLength, text);
     }
 
     public String getText() {
         return text;
     }
 
-    public Map<String, Integer> getGrams() {
+    public Set<String> getGrams() {
         return grams;
     }
 }
