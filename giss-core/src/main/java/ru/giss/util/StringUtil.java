@@ -29,20 +29,6 @@ public class StringUtil {
         return sb.toString();
     }
 
-    public static String[] nGrams(int n, String s) {
-        StringBuilder sb = new StringBuilder();
-        for (int i = 0; i < n - 1; i++) {
-            sb.append('|');
-        }
-        String newS = sb.append(s).toString();
-        int size = newS.length() - n + 1;
-        String[] res = new String[size];
-        for (int i = 0; i < size; i++) {
-            res[i] = newS.substring(i, i + n);
-        }
-        return res;
-    }
-
     public static Set<String> nGramSet(int n, String s) {
         StringBuilder sb = new StringBuilder();
         for (int i = 0; i < n - 1; i++) {

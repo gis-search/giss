@@ -4,28 +4,28 @@ import org.junit.Test;
 import org.pcollections.PVector;
 import ru.giss.util.model.token.Token;
 
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Set;
+
 import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 public class StringUtilTest {
     @Test
     public void biGrams() {
-        String[] biGrams = StringUtil.nGrams(2, "Москва");
-
-        assertArrayEquals(
-                new String[]{"|М", "Мо", "ос", "ск", "кв", "ва"},
-                biGrams
-        );
+        Set<String> biGrams = StringUtil.nGramSet(2, "Москва");
+        Set<String> expected = new HashSet<>();
+        Collections.addAll(expected, "|М", "Мо", "ос", "ск", "кв", "ва");
+        assertEquals(expected, biGrams);
     }
 
     @Test
     public void triGrams() {
-        String[] triGrams = StringUtil.nGrams(3, "Москва");
-
-        assertArrayEquals(
-                new String[]{"||М", "|Мо", "Мос", "оск", "скв", "ква"},
-                triGrams
-        );
+        Set<String> triGrams = StringUtil.nGramSet(3, "Москва");
+        Set<String> expected = new HashSet<>();
+        Collections.addAll(expected, "||М", "|Мо", "Мос", "оск", "скв", "ква");
+        assertEquals(expected, triGrams);
     }
 
     @Test
