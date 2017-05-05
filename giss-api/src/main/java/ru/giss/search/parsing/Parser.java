@@ -46,7 +46,7 @@ public class Parser {
                 .flatMap(this::parseCity).distinct().sorted(comparator).limit(10)
                 .flatMap(this::parseVillage).distinct().sorted(comparator).limit(10)
                 .flatMap(this::parseStreet).distinct().sorted(comparator).limit(10)
-                .map(this::parseHouse)
+                .flatMap(this::parseHouse).distinct().sorted(comparator).limit(10)
                 .map(ParseContext::toResult)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -122,13 +122,13 @@ public class Parser {
         }
     }
 
-    private ParseContext parseHouse(ParseContext context) {
-        Optional<ParseContext> optContextWithMatch = context.getOptStreet().flatMap(street -> {
+    private Stream<ParseContext> parseHouse(ParseContext context) {
+        List<ParseContext> houseContexts = optionToStream(context.getOptStreet()).flatMap(street -> {
             HouseInfo houseInfo = backend.getStreetToHouseInfo().get(street.getDoc());
             if (houseInfo == null) {
-                return Optional.empty();
+                return Stream.empty();
             }
-            return context.findProbableHouseNumber().flatMap(tokenAndMatcher -> {
+            return optionToStream(context.findProbableHouseNumber()).flatMap(tokenAndMatcher -> {
                 Token token = tokenAndMatcher.getLeft();
                 Matcher matcher = tokenAndMatcher.getRight();
                 String number = matcher.group(RootConfig.NUMBER_REGEX_GROUP);
@@ -136,7 +136,7 @@ public class Parser {
                 Token buildingToken = null;
                 Map<String, Address> buildingToAddress = houseInfo.getNumberToBuildings().get(number);
                 if (buildingToAddress == null) {
-                    return Optional.empty();
+                    return Stream.empty();
                 }
                 if (optBuilding == null && buildingToAddress.size() > 1) {
                     PVector<Token> tokens = context.getTokens();
@@ -150,21 +150,32 @@ public class Parser {
                     }
                 }
                 Address resultAddress = buildingToAddress.get(optBuilding);
+                boolean isBuildingParsed = true;
                 if (resultAddress == null && optBuilding != null) {
                     resultAddress = buildingToAddress.get(null);
+                    isBuildingParsed = false;
                 }
                 if (resultAddress == null) {
-                    return Optional.empty();
+                    List<ParseContext>  resContexts = new ArrayList<>(buildingToAddress.values().size());
+                    for (Address suggestedBuilding : buildingToAddress.values()) {
+                        Match<Address> match = new Match<>(suggestedBuilding, 0);
+                        resContexts.add(context.withAddress(match, Collections.singletonList(token), AT_HOUSE));
+                    }
+                    return resContexts.stream();
                 } else {
-                    Match match = new Match<>(resultAddress, 10000000);
+                    Match<Address> match = new Match<>(resultAddress, 1000000000L * (isBuildingParsed ? 2 : 1));
                     List<Token> matchTokens = new ArrayList<>(2);
                     matchTokens.add(token);
                     if (buildingToken != null) matchTokens.add(buildingToken);
-                    return Optional.of(context.withAddress(match, matchTokens, AT_HOUSE));
+                    return Stream.of(context.withAddress(match, matchTokens, AT_HOUSE));
                 }
             });
-        });
-        return optContextWithMatch.orElse(context);
+        }).collect(Collectors.toList());
+        if (houseContexts.isEmpty()) {
+            return Stream.of(context);
+        } else {
+            return houseContexts.stream();
+        }
     }
 
     private List<ParseContext> parseAddress(ParseContext context,
@@ -195,5 +206,9 @@ public class Parser {
             res.add(context.withAddress(kv.getKey(), kv.getValue(), type));
         }
         return res;
+    }
+
+    private static <T> Stream<T> optionToStream(Optional<T> opt) {
+        return opt.map(Stream::of).orElseGet(Stream::empty);
     }
 }
