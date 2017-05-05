@@ -32,7 +32,7 @@ public class AddressScoreCounter implements ScoreCounter<Document<Address>, Addr
         }
 
         double gramDist = StringUtil.normGramDistance(req.getGrams(), doc.getGrams());
-        if (gramDist > 0.2) {
+        if (gramDist > 0.4) {
             return -1;
         }
 

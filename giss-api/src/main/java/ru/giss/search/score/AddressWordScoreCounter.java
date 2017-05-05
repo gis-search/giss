@@ -15,7 +15,7 @@ public class AddressWordScoreCounter implements ScoreCounter<Document<AddressWor
             return -1;
         }
         double gramDist = StringUtil.normGramDistance(req.getGrams(), doc.getGrams());
-        if (gramDist > 0.2) {
+        if (gramDist > 0.4) {
             return -1;
         }
         return (int) ((1 - gramDist) * 1000);

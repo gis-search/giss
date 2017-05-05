@@ -24,7 +24,9 @@ public class ApiController {
     @GetMapping("/search")
     public List<SearchResult> search(
             @RequestParam(value = "text") String text) {
+        long t0 = System.currentTimeMillis();
         List<ParseResult> results = parser.parse(text);
+        System.out.println(System.currentTimeMillis() - t0);
         return results.stream()
                 .map(r -> new SearchResult(r.getAddress()))
                 .collect(Collectors.toList());

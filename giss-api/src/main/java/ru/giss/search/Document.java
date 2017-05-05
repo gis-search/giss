@@ -20,7 +20,7 @@ public class Document<T> {
         this.id = id;
         this.term = term;
         this.item = item;
-        this.grams = nGramMap(gramLength, normalize(term, false));
+        this.grams = nGramMap(gramLength, normalize(term, true));
     }
 
     public int getId() {
