@@ -43,12 +43,13 @@ message AddressMsg {
 
     optional string name = 3;
     repeated AddressWordWithPosition address_word_with_position = 4;
+    repeated string synonyms = 5;
 
-    optional AddressType type = 5;
+    optional AddressType type = 6;
 
-    optional float latitude = 6;
-    optional float longitude = 7;
+    optional float latitude = 7;
+    optional float longitude = 8;
 
-    optional int32 child_count = 8;
-    optional int32 population = 9;
+    optional int32 child_count = 9;
+    optional int32 population = 10;
 }

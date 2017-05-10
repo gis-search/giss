@@ -17,7 +17,7 @@ public class StringUtil {
 
     public static String normalize(String s, boolean preserveLength) {
         StringBuilder sb = new StringBuilder();
-        for (char c : s.toLowerCase().toCharArray()) {
+        for (char c : s.trim().toLowerCase().toCharArray()) {
             if (c >= 'a' && c <= 'я' || Character.isDigit(c)) {
                 sb.append(c);
             } else if (c == 'ё') {

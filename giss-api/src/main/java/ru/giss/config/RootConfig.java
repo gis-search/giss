@@ -89,12 +89,17 @@ public class RootConfig {
                         case AT_STREET: index = streetIndex; break;
                         default: continue;
                     }
-                    String normName = normalize(node.getName(), true);
-                    Document<Address> doc = new Document<>(curDocId++, normName, node);
-                    docs.add(doc);
-                    Set<String> nGrams = nGramSet(gramLength, normName);
-                    for (String gram : nGrams) {
-                        index.computeIfAbsent(gram, k -> new ArrayList<>()).add(doc);
+                    List<String> terms = new ArrayList<>();
+                    terms.addAll(msg.getSynonymsList());
+                    terms.add(msg.getName());
+                    for (String term : terms) {
+                        String normTerm = normalize(term, true);
+                        Document<Address> doc = new Document<>(curDocId++, normTerm, node);
+                        docs.add(doc);
+                        Set<String> nGrams = nGramSet(gramLength, normTerm);
+                        for (String gram : nGrams) {
+                            index.computeIfAbsent(gram, k -> new ArrayList<>()).add(doc);
+                        }
                     }
                 } else {
                     Matcher matcher = HOUSE_REGEX.matcher(msg.getName().toLowerCase());
