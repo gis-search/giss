@@ -21,6 +21,9 @@ public class Address {
 
     private int score;
 
+    public final static int MSK_REGION = 2501386;
+    public final static int SPB_REGION = 5068655;
+
     public Address(int id,
                    Address parent,
                    String name,
@@ -74,7 +77,13 @@ public class Address {
     }
 
     public String fullName() {
-        String parentName = parent == null ? "" : (parent.fullName() + ", ");
+        String parentName = parent == null ? "" : (parent.fullName());
+        if (id == MSK_REGION || id == SPB_REGION) {
+            return parentName;
+        }
+        if (!parentName.isEmpty()) {
+            parentName += ", ";
+        }
         String prefix = "";
         String suffix = "";
         for (AddressWordWithPosition wordWithPos : addressWordsWithPosition) {
