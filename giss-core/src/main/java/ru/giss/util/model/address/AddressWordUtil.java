@@ -1,4 +1,4 @@
-package ru.giss.util.address;
+package ru.giss.util.model.address;
 
 import org.ahocorasick.trie.Emit;
 import org.ahocorasick.trie.Trie;

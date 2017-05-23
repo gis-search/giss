@@ -4,28 +4,30 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
-import ru.giss.model.Address;
-import ru.giss.search.Match;
-import ru.giss.search.SearchRequest;
-import ru.giss.search.Searcher;
+import ru.giss.search.parsing.ParseResult;
+import ru.giss.search.parsing.Parser;
 import ru.giss.web.dto.SearchResult;
 
-import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 public class ApiController {
+
+    private final Parser parser;
+
     @Autowired
-    private Searcher citySearcher;
+    public ApiController(Parser parser) {
+        this.parser = parser;
+    }
 
     @GetMapping("/search")
-    public SearchResult search(
-            @RequestParam(value = "text") String text) {
-        ArrayList<Match> results = citySearcher.search(new SearchRequest(text));
-        if (results.isEmpty()) {
-            return null;
-        } else {
-            Address top = results.get(0).getDoc();
-            return new SearchResult(top);
-        }
+    public List<SearchResult> search(
+            @RequestParam(value = "text") String text,
+            @RequestParam(value = "debug", required = false) boolean debug) {
+        List<ParseResult> results = parser.parse(text);
+        return results.stream()
+                .map(r -> new SearchResult(r, debug))
+                .collect(Collectors.toList());
     }
 }

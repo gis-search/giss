@@ -1,4 +1,4 @@
-package ru.giss.util.address;
+package ru.giss.util.model.address;
 
 import ru.giss.AddressModel;
 
@@ -19,6 +19,10 @@ public class AddressWordInfo {
         this.addressType = addressType;
     }
 
+    public int getId() {
+        return word.getNumber();
+    }
+
     public AddressModel.AddressWord getWord() {
         return word;
     }
@@ -33,5 +37,10 @@ public class AddressWordInfo {
 
     public AddressModel.AddressType getAddressType() {
         return addressType;
+    }
+
+    @Override
+    public String toString() {
+        return "AddressWordInfo{" + word + "}";
     }
 }

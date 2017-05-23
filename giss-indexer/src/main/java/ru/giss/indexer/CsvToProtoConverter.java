@@ -2,10 +2,13 @@ package ru.giss.indexer;
 
 import org.apache.commons.lang3.tuple.Pair;
 import ru.giss.AddressModel;
-import ru.giss.util.address.AddressWordUtil;
+import ru.giss.util.model.address.AddressWordUtil;
 
 import java.io.*;
+import java.util.Arrays;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
 
@@ -14,7 +17,8 @@ import java.util.zip.GZIPOutputStream;
  */
 public class CsvToProtoConverter {
 
-    public static void convert(File csvFile, File protoFile) throws IOException {
+    public static void convert(File csvFile, File aliasFile, File protoFile) throws IOException {
+        Map<Integer, String[]> idToAliases = loadAliases(aliasFile);
         BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(csvFile))));
         reader.readLine();
         OutputStream os = new BufferedOutputStream(new GZIPOutputStream(new FileOutputStream(protoFile)));
@@ -71,6 +75,10 @@ public class CsvToProtoConverter {
                     AddressWordUtil.stripAddressWords(name, type);
             builder.setName(nameAndAddressWords.getLeft());
             builder.addAllAddressWordWithPosition(nameAndAddressWords.getRight());
+            String[] aliases = idToAliases.get(id);
+            if (aliases != null) {
+                builder.addAllSynonyms(Arrays.asList(aliases));
+            }
             builder.setType(type);
             builder.setLatitude(lat);
             builder.setLongitude(lon);
@@ -81,5 +89,19 @@ public class CsvToProtoConverter {
         }
         System.out.println("Converting successfully finished");
         os.close();
+    }
+
+    private static Map<Integer, String[]> loadAliases(File file) throws IOException {
+        BufferedReader reader = new BufferedReader(new InputStreamReader(new GZIPInputStream(new FileInputStream(file))));
+        reader.readLine();
+        Map<Integer, String[]> res = new HashMap<>();
+        while (reader.ready()) {
+            String line = reader.readLine();
+            String[] split = line.split(";");
+            int id = Integer.parseInt(split[0]);
+            String[] aliases = split[1].split(",");
+            res.put(id, aliases);
+        }
+        return res;
     }
 }

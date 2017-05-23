@@ -1,49 +1,40 @@
 package ru.giss.search;
 
-import ru.giss.model.Address;
+import ru.giss.search.request.SearchRequest;
 import ru.giss.search.score.ScoreCounter;
-import ru.giss.search.score.SimpleScoreCounter;
 
 import java.util.*;
-
-import static ru.giss.util.StringUtil.nGrams;
 
 /**
  * @author Ruslan Izmaylov
  */
-public class Searcher {
+public class Searcher<D, R extends SearchRequest> {
 
-    private final static List<Address> EMPTY_POSTING = new ArrayList<>(0);
+    private final List<Document<D>> EMPTY_POSTING = new ArrayList<>(0);
 
-    private Map<String, ArrayList<Address>> index;
-    private ArrayList<Address> nodes;
-    private ScoreCounter scoreCounter;
+    private Map<String, ArrayList<Document<D>>> index;
+    private ArrayList<Document<D>> docs;
+    private ScoreCounter<Document<D>, R> scoreCounter;
 
-    private int gramLength;
-
-    public Searcher(Map<String, ArrayList<Address>> index,
-                    ArrayList<Address> nodes) {
-        this(index, nodes, new SimpleScoreCounter());
-    }
-
-    public Searcher(Map<String, ArrayList<Address>> index,
-                    ArrayList<Address> nodes,
-                    ScoreCounter scoreCounter) {
+    public Searcher(Map<String, ArrayList<Document<D>>> index,
+                    ArrayList<Document<D>> docs,
+                    ScoreCounter<Document<D>, R> scoreCounter) {
         this.index = index;
-        this.nodes = nodes;
+        this.docs = docs;
         this.scoreCounter = scoreCounter;
-        this.gramLength = index.keySet().iterator().next().length();
     }
 
-    public ArrayList<Match> search(SearchRequest req) {
-        String[] qGrams = nGrams(gramLength, req.getText());
+    public ArrayList<Match<D>> search(R req) {
+        String[] qGrams = new String[req.getGrams().size()];
+        req.getGrams().toArray(qGrams);
         // Initializing stuff
-        int maxError = Math.min(2, qGrams.length - 1); // TODO think about a better value
+        int maxError = Math.min(6, (qGrams.length - 1) / 3 * 2 + 1);
+        if (qGrams.length <= 2) maxError = 0;
         int[] postPointers = new int[qGrams.length];
         int postingsExhausted = 0;
-        List<Address>[] postings = new ArrayList[qGrams.length];
+        List<Document<D>>[] postings = new ArrayList[qGrams.length];
         for (int i = 0; i < qGrams.length; i++) {
-            ArrayList<Address> optPosting = index.get(qGrams[i]);
+            ArrayList<Document<D>> optPosting = index.get(qGrams[i]);
             if (optPosting == null) {
                 postingsExhausted++;
                 postings[i] = EMPTY_POSTING;
@@ -53,7 +44,7 @@ public class Searcher {
         }
         Arrays.fill(postPointers, -1);
         // a heap with score sorting might be better
-        ArrayList<Match> matches = new ArrayList<>();
+        ArrayList<Match<D>> matches = new ArrayList<>();
         // Traversing postings
         while (postingsExhausted <= maxError) {
             postingsExhausted = 0;
@@ -77,7 +68,7 @@ public class Searcher {
             // traversing postings until an interesting doc
             int matchedGramCount = 0;
             for (int i = 0; i < postings.length; i++) {
-                List<Address> posting = postings[i];
+                List<Document<D>> posting = postings[i];
                 // surprisingly, binary search works slower
                 // it's likely because of random array accesses
                 // which cause cache misses
@@ -110,11 +101,12 @@ public class Searcher {
                 postPointers[i] = cur;
             }
             if (qGrams.length - matchedGramCount <= maxError) {
-                Address doc = nodes.get(interestingDocId);
-                matches.add(new Match(doc, scoreCounter.count(req, matchedGramCount, doc)));
+                Document<D> doc = docs.get(interestingDocId);
+                long score = scoreCounter.count(req, doc);
+                if (score > 0) matches.add(new Match<>(doc.getItem(), score));
             }
         }
-        matches.sort((m1, m2) -> m2.getScore() - m1.getScore());
+        matches.sort((m1, m2) -> Long.compare(m2.getScore(), m1.getScore()));
         return matches;
     }
 }
