@@ -1,0 +1,4 @@
+giss.addresses.csv=~/giss.csv.gz
+giss.aliases.csv=~/giss-aliases.csv.gz
+giss.addresses.proto=~/giss1.pb.gz
+giss.gram-length=2
