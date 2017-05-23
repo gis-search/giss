@@ -2,6 +2,7 @@ package ru.giss.config;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
@@ -12,10 +13,7 @@ import ru.giss.search.parsing.Parser;
 import ru.giss.search.request.SearchRequest;
 import ru.giss.search.score.AddressScoreCounter;
 import ru.giss.search.score.AddressWordScoreCounter;
-import ru.giss.util.model.address.Address;
-import ru.giss.util.model.address.AddressWordInfo;
-import ru.giss.util.model.address.HouseInfo;
-import ru.giss.util.model.address.IndexedAddressedWords;
+import ru.giss.util.model.address.*;
 import ru.giss.web.config.WebConfig;
 
 import java.io.BufferedInputStream;
@@ -48,6 +46,9 @@ public class RootConfig {
 
     @Value("${giss.gram-length:2}")
     private int gramLength;
+
+    @Autowired
+    private AddressFilter addressFilter;
 
     public final static String NUMBER_REGEX_GROUP = "number";
     public final static String BUILDING_REGEX_GROUP = "building";
@@ -84,6 +85,7 @@ public class RootConfig {
                         msg.getChildCount(),
                         msg.getPopulation());
                 nodes.add(node);
+                if (!addressFilter.isSuitable(node)) continue;
                 if (msg.getType() != AT_HOUSE) {
                     Map<String, ArrayList<Document<Address>>> index;
                     switch (msg.getType()) {

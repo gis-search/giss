@@ -11,7 +11,7 @@ import ru.giss.config.RootConfig;
 import java.util.List;
 
 @RunWith(SpringJUnit4ClassRunner.class)
-@ContextConfiguration(classes = RootConfig.class)
+@ContextConfiguration(classes = { RootConfig.class, TestConfig.class })
 public class ParserTest {
     @Autowired
     private Parser parser;
