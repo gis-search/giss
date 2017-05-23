@@ -3,10 +3,7 @@ package ru.giss.config;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
+import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import ru.giss.AddressModel;
 import ru.giss.search.Document;
@@ -19,6 +16,7 @@ import ru.giss.util.model.address.Address;
 import ru.giss.util.model.address.AddressWordInfo;
 import ru.giss.util.model.address.HouseInfo;
 import ru.giss.util.model.address.IndexedAddressedWords;
+import ru.giss.web.config.WebConfig;
 
 import java.io.BufferedInputStream;
 import java.io.FileInputStream;
@@ -34,7 +32,13 @@ import static ru.giss.util.StringUtil.nGramSet;
 import static ru.giss.util.StringUtil.normalize;
 
 @Configuration
-@ComponentScan(basePackages = "ru.giss")
+@ComponentScan(basePackages = "ru.giss", excludeFilters = {
+        @ComponentScan.Filter(
+                type = FilterType.ASSIGNABLE_TYPE,
+                value = {
+                        WebConfig.class
+                })
+})
 @PropertySource("classpath:core.properties")
 public class RootConfig {
     private static final Logger LOG = LoggerFactory.getLogger(RootConfig.class);
